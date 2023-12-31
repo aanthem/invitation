@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 
 app = Flask(__name__)
@@ -14,7 +15,6 @@ if __name__ == "__main__":
 
 from dotenv import load_dotenv
 load_dotenv()
-import os
 token = os.getenv("DISCORD_TOKEN")
 import discord
 from discord.ext import commands
