@@ -1,20 +1,6 @@
-import os
-from flask import Flask
-
-app = Flask(__name__)
-
-# Define your routes and bot logic here
-
-if __name__ == "__main__":
-    # Use the PORT environment variable provided by Heroku, default to 5000 if not available
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-
-
-
-
 from dotenv import load_dotenv
 load_dotenv()
+import os
 token = os.getenv("DISCORD_TOKEN")
 import discord
 from discord.ext import commands
@@ -101,13 +87,9 @@ async def on_member_update(before, after):
             embed.add_field(name="📌 Responsible Moderator:", value=responsible_moderator.mention, inline=True)
 
             current_time = datetime.datetime.now(server_timezone)
-            difference = (current_time - roles_updated_time).total_seconds()
-            if difference < 86400:  # Less than 24 hours
-                footer_text = f"Today at {roles_updated_time.strftime('%I:%M %p')}"
-            elif difference < 172800:  # Less than 48 hours
-                footer_text = f"Yesterday at {roles_updated_time.strftime('%I:%M %p')}"
-            else:
-                footer_text = roles_updated_time.strftime("%d/%m/%Y at %I:%M %p")
+            
+            # Modify the footer_text to display the time and date
+            footer_text = roles_updated_time.strftime("%d/%m/%Y at %I:%M %p")
 
             embed.set_footer(text=f".gg/invitation • {footer_text}")
 
@@ -155,19 +137,15 @@ async def send_welcome_embed(member, welcome_channel_id):
     embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
     current_time = datetime.datetime.now(joined_at_timezone.tzinfo)
 
-    difference = (current_time - joined_at_timezone).total_seconds()
-    if difference < 86400:  # Less than 24 hours
-        footer_text = f"Today at {joined_at_timezone.strftime('%I:%M %p')}"
-    elif difference < 172800:  # Less than 48 hours
-        footer_text = f"Yesterday at {joined_at_timezone.strftime('%I:%M %p')}"
-    else:
-        footer_text = joined_at_timezone.strftime("%d/%m/%Y at %I:%M %p")
+    # Modify the footer_text to display the time and date
+    footer_text = joined_at_timezone.strftime("%d/%m/%Y at %I:%M %p")
 
     embed.set_footer(text=f".gg/invitation • {footer_text}")
 
     # Sends the embed
     channel = bot.get_channel(welcome_channel_id)
     await channel.send(embed=embed)
+
 
 
 
@@ -236,7 +214,6 @@ async def send_farewell_embed(member, farewell_channel_id, kick_reason=None):
     user_avatar_url = member.avatar.url if member.avatar else member.default_avatar.url
     blank = ""
 
-
     if kick_reason is not None:
         action = discord.AuditLogAction.kick
         responsible_moderator, reason = await get_responsible_moderator(member.guild, member, action)
@@ -283,14 +260,7 @@ async def send_farewell_embed(member, farewell_channel_id, kick_reason=None):
         embed.description = f"Goodbye, {member.mention}!"
         embed.add_field(name="🛫Left the server at:", value=leave_time, inline=False)
 
-    current_time = datetime.datetime.now(left_at_timezone.tzinfo)
-    difference = current_time - left_at_timezone
-    if difference.days == 0:
-        footer_text = f"Today at {current_time.strftime('%I:%M %p')}"
-    elif difference.days == 1:
-        footer_text = "Yesterday"
-    else:
-        footer_text = current_time.strftime("%d/%m/%Y %I:%M %p")
+    footer_text = left_at_timezone.strftime("%d/%m/%Y at %I:%M %p")
 
     embed.set_footer(text=f".gg/invitation • {footer_text}")
 
